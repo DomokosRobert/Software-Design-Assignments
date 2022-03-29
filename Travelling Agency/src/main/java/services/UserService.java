@@ -1,4 +1,5 @@
 package services;
+import model.Pack;
 import model.User;
 import repository.UserRepository;
 
@@ -35,4 +36,5 @@ public class UserService {
     public List<User> getAllUsers() {
         return repo.getAllUsers();
     }
+    public void bookPack(User u, Pack p){repo.bookPack(u, p);}
 }

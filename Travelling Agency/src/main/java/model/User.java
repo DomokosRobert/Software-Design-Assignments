@@ -17,6 +17,12 @@ public class User{
     @Column(unique = true, nullable = false)
     private String password;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_pack",
+    joinColumns = @JoinColumn(name="user_id"),
+    inverseJoinColumns = @JoinColumn(name="pack_id"))
+    private List<Pack> packs;
+
     public String getPassword() {
         return password;
     }
@@ -36,6 +42,10 @@ public class User{
         this.id=id;
         this.username=username;
         this.password=password;
+        this.packs = null;
     }
 
+    public List<Pack> getPacks() {
+        return packs;
+    }
 }

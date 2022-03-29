@@ -1,6 +1,7 @@
 package model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name ="package")
@@ -30,6 +31,9 @@ public class Pack {
     @JoinColumn(name = "destination_city")
     private Destination destinations;
 
+    @ManyToMany
+    private List<User> users;
+
     public Pack(int id,String name, int price, int peopleNum, int periodTime,String details, Status stat, Destination destinations) {
        this.id = id;
         this.name = name;
@@ -39,10 +43,20 @@ public class Pack {
         this.stat = stat;
         this.details=details;
         this.destinations = destinations;
+        this.users = null;
+
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setPeopleNum(int peopleNum) {
+        this.peopleNum = peopleNum;
+    }
+
+    public void setStat(Status stat) {
+        this.stat = stat;
     }
 
     public Pack() {

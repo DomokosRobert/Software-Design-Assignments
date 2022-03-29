@@ -1,5 +1,6 @@
 package repository;
 
+import model.Pack;
 import model.User;
 
 import javax.persistence.EntityManager;
@@ -33,6 +34,15 @@ public class UserRepository {
         em.getTransaction().commit();
         em.close();
         return null;
+    }
+    public void bookPack(User u,Pack p){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        User existingUser = em.find(User.class, u.getId());
+        Pack existingPack = em.find(Pack.class, p.getId());
+        existingUser.getPacks().add(existingPack);
+        em.getTransaction().commit();
+        em.close();
     }
 
 

@@ -2,7 +2,9 @@ package presentation;
 
 import controller.DestinationController;
 import controller.PackageController;
+import controller.UserController;
 import model.Pack;
+import model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,8 +21,13 @@ public class UserFrame {
     private JTable table;
     private JButton filterButton;
     private JTable table1;
+    private JTextField periodField2;
+    private JTextField priceField2;
+    private JButton viewBookedButton;
     public static final PackageController packController = new PackageController();
     public static final DestinationController destController = new DestinationController();
+    public static final UserController userController = new UserController();
+
 
 
     public JPanel getUserPanel() {
@@ -60,22 +67,42 @@ public class UserFrame {
 
         }
     }
-    public UserFrame(){
+    public UserFrame(User u){
         setHeader(table);
         viewButton.addActionListener(e->{
                 setContent(packController.getAvailable(),table);});
         filterButton.addActionListener(e->{
             if(!packField.getText().isEmpty())
                 setContent(packController.getByDst(packField.getText()),table);
-            if(!priceField.getText().isEmpty())
-                setContent(packController.getSmallerPrice(Integer.parseInt(priceField.getText())),table);
-            if(!periodField.getText().isEmpty())
-                setContent(packController.getLargerPeriod(Integer.parseInt(periodField.getText())),table);
+            if(!priceField.getText().isEmpty()&&!priceField2.getText().isEmpty())
+                setContent(packController.getSmallerPrice(Integer.parseInt(priceField.getText()),Integer.parseInt(priceField2.getText())),table);
+            if(!periodField.getText().isEmpty()&&!periodField2.getText().isEmpty())
+                setContent(packController.getLargerPeriod(Integer.parseInt(periodField.getText()),Integer.parseInt(periodField2.getText())),table);
+            if(!packField.getText().isEmpty()&&!priceField.getText().isEmpty()&&!priceField2.getText().isEmpty()) {
+                setContent(packController.getFilterDestPrice(packField.getText(), Integer.parseInt(priceField.getText()), Integer.parseInt(priceField2.getText())),table);
+            }
+            if(!packField.getText().isEmpty()&&!priceField.getText().isEmpty()&&!priceField2.getText().isEmpty()&&!periodField.getText().isEmpty()&&!periodField2.getText().isEmpty())
+            {
+                setContent(packController.getFilterAll(packField.getText(),Integer.parseInt(priceField.getText()),Integer.parseInt(priceField2.getText()),Integer.parseInt(periodField.getText()),Integer.parseInt(periodField2.getText())), table);}
+            if(!priceField.getText().isEmpty()&&!priceField2.getText().isEmpty()&&!periodField.getText().isEmpty()&&!periodField2.getText().isEmpty()){
+                setContent(packController.getFilterPricePeriod(Integer.parseInt(priceField.getText()),Integer.parseInt(priceField2.getText()),Integer.parseInt(periodField.getText()),Integer.parseInt(periodField2.getText())),table);
+
+            }
+            if(!packField.getText().isEmpty()&&!periodField.getText().isEmpty()&&!periodField2.getText().isEmpty()){
+                setContent(packController.getFilterDestPeriod(packField.getText(), Integer.parseInt(periodField.getText()), Integer.parseInt(periodField2.getText())),table);
+            }
+
+
 
         });
         setHeader(table1);
-        bookButton.addActionListener(e->{
+        viewBookedButton.addActionListener(e->{
+            setContent(u.getPacks(), table1);
 
+        });
+        bookButton.addActionListener(e->{
+            packController.updatePack(packController.findByName(packField.getText()));
+            userController.bookPack(u,packController.findByName(packField.getText()));
 
         });
     }

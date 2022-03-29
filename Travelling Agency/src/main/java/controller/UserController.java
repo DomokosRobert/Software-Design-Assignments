@@ -1,5 +1,6 @@
 package controller;
 
+import model.Pack;
 import model.User;
 import services.UserService;
 
@@ -23,4 +24,5 @@ public class UserController {
     public List<User> getAllUsers(){
         return service.getAllUsers();
     }
+    public void bookPack(User u, Pack p){service.bookPack(u,p);}
 }

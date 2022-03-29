@@ -9,8 +9,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import java.util.List;
 
-import static model.Status.IN_PROGRESS;
-import static model.Status.NOT_BOOKED;
+import static model.Status.*;
 
 public class PackageRepository {
     public static final EntityManagerFactory entityManagerFactory =
@@ -22,6 +21,19 @@ public class PackageRepository {
         em.persist(pack);
         em.getTransaction().commit();
         em.close();
+    }
+    public Pack findByName(String name){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        try{
+            return em.createQuery(
+                    "SELECT p FROM Pack p WHERE p.name =: name", Pack.class).setParameter("name",name).getSingleResult();
+        }catch (NoResultException e) {
+            System.out.println("No user found");
+        }
+        em.getTransaction().commit();
+        em.close();
+        return null;
     }
     public List<Pack> getAllPacks() {
         EntityManager em = entityManagerFactory.createEntityManager();
@@ -52,7 +64,7 @@ public class PackageRepository {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         try {
-            em.createQuery("UPDATE Pack p SET p.peopleNum =: peopleNum WHERE p.name =: name").setParameter("name",name ).setParameter("peopleNum",peopleNum).executeUpdate();
+            em.createQuery("UPDATE Pack p SET p.peopleNum =: peopleNum, p.stat =: IN_PROGRESS  WHERE p.name =: name").setParameter("IN_PROGRESS",IN_PROGRESS).setParameter("name",name ).setParameter("peopleNum",peopleNum).executeUpdate();
         }catch (NoResultException e) {
             System.out.println("No packs found");
         }
@@ -133,11 +145,11 @@ public class PackageRepository {
         em.close();
         return null;
     }
-    public List<Pack> getSmallerPrice(int price) {
+    public List<Pack> getSmallerPrice(int price,int price2) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         try {
-            return em.createQuery("SELECT p FROM Pack p WHERE p.price <=: price", Pack.class).setParameter("price",price).getResultList();
+            return em.createQuery("SELECT p FROM Pack p WHERE p.price >=: price AND p.price <=: price2", Pack.class).setParameter("price",price).setParameter("price2",price2).getResultList();
         }catch (NoResultException e) {
             System.out.println("No packs made yet");
         }
@@ -145,11 +157,11 @@ public class PackageRepository {
         em.close();
         return null;
     }
-    public List<Pack> getLargerPeriod(int periodTime) {
+    public List<Pack> getLargerPeriod(int periodTime1, int periodTime2) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         try {
-            return em.createQuery("SELECT p FROM Pack p WHERE p.periodTime >=: periodTime", Pack.class).setParameter("periodTime",periodTime).getResultList();
+            return em.createQuery("SELECT p FROM Pack p WHERE p.periodTime >=: periodTime1 AND p.periodTime <=: periodTime2", Pack.class).setParameter("periodTime1",periodTime1).setParameter("periodTime2",periodTime2).getResultList();
         }catch (NoResultException e) {
             System.out.println("No packs made yet");
         }
@@ -157,7 +169,69 @@ public class PackageRepository {
         em.close();
         return null;
     }
-
+    public List<Pack> getFilterAll(String city,int price,int price2,int periodTime1, int periodTime2) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        try {
+            return em.createQuery("SELECT p FROM Pack p WHERE  p.destinations.city =: city AND p.price >=: price AND p.price <=: price2 AND p.periodTime >=: periodTime1 AND p.periodTime <=: periodTime2", Pack.class).setParameter("price",price).setParameter("price2",price2).setParameter("city",city).setParameter("periodTime1",periodTime1).setParameter("periodTime2",periodTime2).getResultList();
+        }catch (NoResultException e) {
+            System.out.println("No packs made yet");
+        }
+        em.getTransaction().commit();
+        em.close();
+        return null;
+    }
+    public List<Pack> getFilterDestPrice(String city,int price,int price2){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        try {
+            return em.createQuery("SELECT p FROM Pack p WHERE  p.destinations.city =: city AND p.price >=: price AND p.price <=: price2", Pack.class).setParameter("price",price).setParameter("price2",price2).setParameter("city",city).getResultList();
+        }catch (NoResultException e) {
+            System.out.println("No packs made yet");
+        }
+        em.getTransaction().commit();
+        em.close();
+        return null;
+    }
+    public List<Pack> getFilterDestPeriod(String city,int periodTime1, int periodTime2){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        try {
+            return em.createQuery("SELECT p FROM Pack p WHERE  p.destinations.city =: city AND p.periodTime >=: periodTime1 AND p.periodTime <=: periodTime2", Pack.class).setParameter("city",city).setParameter("periodTime1",periodTime1).setParameter("periodTime2",periodTime2).getResultList();
+        }catch (NoResultException e) {
+            System.out.println("No packs made yet");
+        }
+        em.getTransaction().commit();
+        em.close();
+        return null;
+    }
+    public List<Pack> getFilterPricePeriod(int price,int price2,int periodTime1, int periodTime2){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        try {
+            return em.createQuery("SELECT p FROM Pack p WHERE  p.price >=: price AND p.price <=: price2 AND p.periodTime >=: periodTime1 AND p.periodTime <=: periodTime2", Pack.class).setParameter("price",price).setParameter("price2",price2).setParameter("periodTime1",periodTime1).setParameter("periodTime2",periodTime2).getResultList();
+        }catch (NoResultException e) {
+            System.out.println("No packs made yet");
+        }
+        em.getTransaction().commit();
+        em.close();
+        return null;
+    }
+    public void updatePack(Pack p){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        Pack existing= em.find(Pack.class, p.getId());
+        if(existing.getStat().equals(IN_PROGRESS)||existing.getStat().equals(NOT_BOOKED))
+            existing.setPeopleNum(p.getPeopleNum()-1);
+        if(existing.getPeopleNum()>0){
+            existing.setStat(IN_PROGRESS);
+        }
+        if(existing.getPeopleNum()==0){
+            existing.setStat(BOOKED);
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
 
 }
 

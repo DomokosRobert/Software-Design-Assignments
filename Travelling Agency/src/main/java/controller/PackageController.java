@@ -46,11 +46,20 @@ public class PackageController {
     public List<Pack> getByDst(String city){
         return service.getByDst(city);
     }
-    public List<Pack> getLargerPeriod(int city){
-        return service.getLargerPeriod(city);
+    public List<Pack> getLargerPeriod(int period1,int period2){
+        return service.getLargerPeriod(period1,period2);
     }
-    public List<Pack> getSmallerPrice(int city){
-        return service.getSmallerPrice(city);
+    public List<Pack> getSmallerPrice(int price1,int price2){
+        return service.getSmallerPrice(price1,price2);
     }
-
+    public List<Pack> getFilterAll(String city,int price1,int price2,int period1,int period2){return service.getFilterAll(city,price1,price2,period1,period2);}
+    public List<Pack> getFilterDestPrice(String city,int price1,int price2){return service.getFilterDestPrice(city,price1,price2);}
+    public List<Pack> getFilterDestPeriod(String city,int period1,int period2){return service.getFilterDestPeriod(city,period1,period2);}
+    public List<Pack> getFilterPricePeriod(int price1,int price2,int period1,int period2){return service.getFilterPricePeriod(price1,price2,period1,period2);}
+    public Pack findByName(String name){
+        return service.findByName(name);
+    }
+    public void updatePack(Pack p){
+        service.updatePack(p);
+    }
 }

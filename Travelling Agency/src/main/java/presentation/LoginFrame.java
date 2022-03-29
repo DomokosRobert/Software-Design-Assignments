@@ -35,7 +35,7 @@ public class LoginFrame {
                     if(u1.getPassword().equals(p))
                     {
                         JFrame frame = new JFrame("UserGUI");
-                        UserFrame fr = new UserFrame();
+                        UserFrame fr = new UserFrame(u1);
                         frame.setContentPane(fr.getUserPanel());
                         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         frame.pack();
